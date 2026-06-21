@@ -1,0 +1,42 @@
+{
+  "name": "task-tracker",
+  "version": "1.0.0",
+  "description": "Task Tracker",
+  "license": "ISC",
+  "author": "Alexis",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start": "npm run build && node ./build/src/index.js",
+    "dev": "nodemon --exec babel-node ./src/index.js",
+    "clean": "rm -rf build && mkdir build",
+    "build-babel": "babel -d ./build/src/ ./src/ -s",
+    "build": "npm run build-babel"
+  },
+  "dependencies": {
+    "@babel/cli": "^7.28.3",
+    "@babel/core": "^7.28.5",
+    "bcrypt": "^6.0.0",
+    "body-parser": "^2.2.0",
+    "cloudinary": "^2.8.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.19.3",
+    "morgan": "^1.10.1",
+    "multer": "^2.0.2",
+    "nodemailer": "^7.0.10",
+    "path": "^0.12.7",
+    "swagger-ui-express": "^5.0.1"
+  },
+  "devDependencies": {
+    "@babel/node": "^7.28.0",
+    "@babel/plugin-transform-runtime": "^7.28.5",
+    "@babel/polyfill": "^7.12.1",
+    "@babel/preset-env": "^7.28.5",
+    "@babel/runtime": "^7.28.4",
+    "baseline-browser-mapping": "^2.10.37",
+    "nodemon": "^3.1.10"
+  }
+}
