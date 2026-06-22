@@ -16,6 +16,7 @@
   "dependencies": {
     "@babel/cli": "^7.28.3",
     "@babel/core": "^7.28.5",
+    "@sendgrid/mail": "^8.1.6",
     "bcrypt": "^6.0.0",
     "body-parser": "^2.2.0",
     "cloudinary": "^2.8.0",

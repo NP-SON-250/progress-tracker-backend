@@ -1,42 +1,30 @@
-import nodemailer from "nodemailer";
+import sgMail from "@sendgrid/mail";
+import fs from "fs";
 
-export const sendMail = async (emailTemplate) => {
-  const { emailTo, subject, message, attachments } = emailTemplate;
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-  // const transporter = nodemailer.createTransport({
-  //   host: "smtp.office365.com",
-  //   port: 587,
-  //   secure: false,
-  //   auth: {
-  //     user: process.env.OutlookUser,
-  //     pass: process.env.OutlookPassword,
-  //   },
-  //   tls: {
-  //     ciphers: "SSLv3",
-  //   },
-  // });
-
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.GMAIL_USER,
-      pass: process.env.GMAIL_APP_PASSWORD,
-    },
-  });
-  const mailOptions = {
-    from: process.env.GMAIL_USER,
-    to: Array.isArray(emailTo) ? emailTo.join(", ") : emailTo,
+const sendMail = async ({ emailTo, subject, message, attachments = [] }) => {
+  const msg = {
+    to: Array.isArray(emailTo) ? emailTo : [emailTo],
+    from: process.env.FROM_EMAIL,
     subject,
     html: message,
-    attachments,
   };
 
-  try {
-    const info = await transporter.sendMail(mailOptions);
-    console.log(`Email sent to: ${mailOptions.to}`, info.response);
-  } catch (error) {
-    console.error("Email sending failed:", error);
+  if (attachments.length > 0) {
+    msg.attachments = attachments.map((attachment) => ({
+      content: fs.readFileSync(attachment.path).toString("base64"),
+      filename: attachment.filename,
+      disposition: "inline",
+      content_id: attachment.cid,
+    }));
   }
+
+  const response = await sgMail.send(msg);
+
+  console.log(`Email sent successfully to ${msg.to}`, response[0].statusCode);
+
+  return response;
 };
 
 export default sendMail;

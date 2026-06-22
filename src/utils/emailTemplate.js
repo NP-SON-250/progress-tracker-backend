@@ -1,8 +1,9 @@
 import sendMail from "../helper/sendMail.js";
+import path from "path";
 const currentYear = new Date().getFullYear();
 
 //1. User Welcome Email
-export const sendWelcomeMessage = (email, fullname, password) => {
+export const sendWelcomeMessage = async (email, fullname, password) => {
   const createDetailRow = (label, value) => `
     <table width="100%" style="border-bottom:1px solid #333; margin:8px 0; padding-bottom:6px; font-size:13px;">
       <tr>
@@ -60,16 +61,16 @@ export const sendWelcomeMessage = (email, fullname, password) => {
     attachments: [
       {
         filename: "zamaraLogowhtBg.png",
-        path: "./zamaraLogowhtBg.png",
+        path: path.join(process.cwd(), "zamaraLogowhtBg.png"),
         cid: "zamaraLogowhtBg",
       },
     ],
   };
 
-  sendMail(emailTemplate);
+  await sendMail(emailTemplate);
 };
 //2. OTP Email
-export const sendOTP = (email, fullname, OTP) => {
+export const sendOTP = async (email, fullname, OTP) => {
   const emailTemplate = {
     emailTo: email,
     subject: "PTC OTP Verification Code",
@@ -104,11 +105,11 @@ export const sendOTP = (email, fullname, OTP) => {
     attachments: [
       {
         filename: "zamaraLogowhtBg.png",
-        path: "./zamaraLogowhtBg.png",
+        path: path.join(process.cwd(), "zamaraLogowhtBg.png"),
         cid: "zamaraLogowhtBg",
       },
     ],
   };
 
-  sendMail(emailTemplate);
+  await sendMail(emailTemplate);
 };
