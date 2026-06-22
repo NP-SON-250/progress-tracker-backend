@@ -26,7 +26,7 @@ export const sendMail = async (emailTemplate) => {
     },
   });
   const mailOptions = {
-    from: process.env.OutlookUser,
+    from: process.env.GMAIL_USER,
     to: Array.isArray(emailTo) ? emailTo.join(", ") : emailTo,
     subject,
     html: message,
