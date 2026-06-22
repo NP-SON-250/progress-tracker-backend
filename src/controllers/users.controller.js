@@ -3,7 +3,7 @@ import Jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { sendWelcomeMessage, sendOTP } from "../utils/emailTemplate.js";
 import { OTPGenerator } from "../utils/otpGenerator.js";
-
+import mongoose from "mongoose";
 export const newAccount = async (req, res) => {
   try {
     const { fullname, email, password } = req.body;
