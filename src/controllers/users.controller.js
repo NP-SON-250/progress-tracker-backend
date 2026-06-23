@@ -1,4 +1,5 @@
 import UsersModel from "../models/users.model.js";
+import DepartmentsModel from "../models/department.model.js";
 import Jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { sendWelcomeMessage, sendOTP } from "../utils/emailTemplate.js";
@@ -331,6 +332,7 @@ export const getAll = async (req, res) => {
 export const getUsersByDepartment = async (req, res) => {
   try {
     const { departmentId } = req.params;
+
     // Validate departmentId
     if (!mongoose.Types.ObjectId.isValid(departmentId)) {
       return res.status(400).json({
@@ -338,8 +340,9 @@ export const getUsersByDepartment = async (req, res) => {
         message: "Invalid department ID format",
       });
     }
-    // Find users that belong to this department
-    const users = await UsersModel.find({
+
+    // Get all users and filter by department in the departments array
+    let users = await UsersModel.find({
       departments: { $in: [departmentId] },
     })
       .populate({
@@ -349,6 +352,23 @@ export const getUsersByDepartment = async (req, res) => {
       })
       .select("-password -lastOTP -otpExpiry")
       .sort({ fullname: 1 });
+
+    // If no users found with departments array, try alternative -
+    // maybe users are stored differently
+    if (users.length === 0) {
+      console.log(
+        "No users found with department in array, trying alternative...",
+      );
+
+      // Alternative: Find users by department name or any other relation
+      const department = await DepartmentsModel.findById(departmentId);
+      if (department) {
+        // You might have users with a single department field instead of array
+        users = await UsersModel.find({ department: departmentId })
+          .populate("departments", "name")
+          .select("-password -lastOTP -otpExpiry");
+      }
+    }
 
     return res.status(200).json({
       status: "200",
