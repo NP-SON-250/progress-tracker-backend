@@ -5,7 +5,7 @@ dotenv.config();
 
 const dbConnector = async () => {
   try {
-    const mongoURI = process.env.MONGO_URL;
+    const mongoURI = process.env.ONLINE_URL;
     if (!mongoURI) {
       throw new Error("MONGO_URL not found in environment variables");
     }
