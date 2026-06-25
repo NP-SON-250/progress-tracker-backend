@@ -253,7 +253,8 @@ export const updateTask = async (req, res) => {
       startDate,
       deadline,
       completedOn,
-      status, // 👈 IMPORTANT: allow status updates
+      status,
+      reasonsForExtending,
     } = req.body;
 
     // 1. Find existing task
@@ -355,9 +356,52 @@ export const updateTask = async (req, res) => {
       }
     }
 
+    // ---------------- DEADLINE VALIDATION WITH REASONS FOR EXTENDING ----------------
+    if (deadline) {
+      const newDeadline = new Date(deadline);
+      const currentDate = new Date();
+      const existingDeadline = existingTask.deadline
+        ? new Date(existingTask.deadline)
+        : null;
+
+      // Check if deadline is in the past
+      if (newDeadline < currentDate) {
+        return res.status(400).json({
+          success: false,
+          message: "Deadline date cannot be in the past",
+        });
+      }
+
+      // Check if deadline has changed
+      if (
+        !existingDeadline ||
+        newDeadline.getTime() !== existingDeadline.getTime()
+      ) {
+        // Validate reasonsForExtending is provided
+        if (!reasonsForExtending || reasonsForExtending.trim() === "") {
+          return res.status(400).json({
+            success: false,
+            message: "Reasons for extending the deadline are required",
+          });
+        }
+
+        // Update deadline and related fields
+        updateData.deadline = deadline;
+        updateData.extendedDeadline = true;
+        updateData.extendedDate = new Date();
+        updateData.reasonsForExtending = reasonsForExtending.trim();
+
+        // Add to status history for tracking
+        existingTask.statusHistory.push({
+          status: existingTask.status || "Running",
+          date: new Date(),
+          comment: `Deadline extended to ${newDeadline.toLocaleDateString()}. Reason: ${reasonsForExtending.trim()}`,
+        });
+      }
+    }
+
     // ---------------- DATES ----------------
     if (startDate) updateData.startDate = startDate;
-    if (deadline) updateData.deadline = deadline;
 
     // ---------------- ASSIGNED USERS ----------------
     if (asignedTo && Array.isArray(asignedTo)) {
