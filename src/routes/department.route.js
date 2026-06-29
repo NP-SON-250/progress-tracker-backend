@@ -3,12 +3,9 @@ import {
   createDepartment,
   getAllDepartments,
   getDepartmentById,
-  getMyDepartments,
-  getDepartmentsByUser,
   searchDepartments,
   updateDepartment,
   deleteDepartment,
-  deleteMultipleDepartments,
   getDepartmentStats,
 } from "../controllers/departments.controller.js";
 import { normal } from "../middleware/middleware.js";
@@ -35,8 +32,5 @@ departmentRoute.get("/departments/search", normal, searchDepartments);
 departmentRoute.get("/departments/:id", normal, getDepartmentById);
 // Update department
 departmentRoute.put("/departments/:id", normal, updateDepartment);
-
-// Delete single department (Only creator or Admin)
-departmentRoute.delete("/departments/:id", normal, deleteDepartment);
 
 export default departmentRoute;

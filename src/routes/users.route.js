@@ -7,7 +7,8 @@ import {
   verifyOTP,
   singleUser,
   deleteUser,
-  getUsersByDepartment
+  getUsersByDepartment,
+  migrateDepartmentIds,
 } from "../controllers/users.controller.js";
 import { normal } from "../middleware/middleware.js";
 import fileUpload from "../helper/multer.js";
@@ -18,12 +19,16 @@ const userRoute = express.Router();
 userRoute.post("/new-account", fileUpload.none(), newAccount);
 userRoute.post("/auth", fileUpload.none(), authenticateUser);
 userRoute.post("/verify", fileUpload.none(), verifyOTP);
+userRoute.post("/migrate-departments", migrateDepartmentIds);
 
 // Protected routes (require authentication)
 userRoute.get("/all-users", normal, getAll);
 userRoute.get("/single-user/:id", normal, singleUser);
-userRoute.get("/users-by-department/:departmentId", normal, getUsersByDepartment);
+userRoute.get(
+  "/users-by-department/:departmentId",
+  normal,
+  getUsersByDepartment,
+);
 userRoute.put("/update-user/:id", normal, updateData);
-userRoute.delete("/delete-user/:id", normal, deleteUser);
 
 export default userRoute;

@@ -46,8 +46,6 @@ export const createDepartment = async (req, res) => {
       data: populatedDepartment,
     });
   } catch (error) {
-    console.error("createDepartment error:", error.message);
-    console.error("Full error:", error);
     return res.status(500).json({
       status: "500",
       message: "Failed to create department",
@@ -55,6 +53,7 @@ export const createDepartment = async (req, res) => {
     });
   }
 };
+
 // ============================================
 // READ - Get all departments
 // ============================================
@@ -71,7 +70,6 @@ export const getAllDepartments = async (req, res) => {
       data: departments,
     });
   } catch (error) {
-    console.error("getAllDepartments error:", error.message);
     return res.status(500).json({
       status: "500",
       message: "Failed to retrieve departments",
@@ -79,6 +77,7 @@ export const getAllDepartments = async (req, res) => {
     });
   }
 };
+
 // ============================================
 // READ - Get single department by ID
 // ============================================
@@ -104,7 +103,6 @@ export const getDepartmentById = async (req, res) => {
       data: department,
     });
   } catch (error) {
-    console.error("getDepartmentById error:", error.message);
     return res.status(500).json({
       status: "500",
       message: "Failed to retrieve department",
@@ -112,6 +110,7 @@ export const getDepartmentById = async (req, res) => {
     });
   }
 };
+
 // ============================================
 // READ - Search departments by name
 // ============================================
@@ -139,7 +138,6 @@ export const searchDepartments = async (req, res) => {
       data: departments,
     });
   } catch (error) {
-    console.error("searchDepartments error:", error.message);
     return res.status(500).json({
       status: "500",
       message: "Failed to search departments",
@@ -147,6 +145,7 @@ export const searchDepartments = async (req, res) => {
     });
   }
 };
+
 // ============================================
 // UPDATE - Update department
 // ============================================
@@ -163,6 +162,7 @@ export const updateDepartment = async (req, res) => {
         message: "Department not found",
       });
     }
+
     const existingDepartment = await DepartmentsModel.findOne({ name: name });
     if (existingDepartment && existingDepartment._id !== department._id) {
       return res.status(400).json({
@@ -170,6 +170,7 @@ export const updateDepartment = async (req, res) => {
         message: "The name was assigned to other department",
       });
     }
+
     const updatedDepartment = await DepartmentsModel.findByIdAndUpdate(
       id,
       {
@@ -185,7 +186,6 @@ export const updateDepartment = async (req, res) => {
       data: updatedDepartment,
     });
   } catch (error) {
-    console.error("updateUserCount error:", error.message);
     return res.status(500).json({
       status: "500",
       message: "Failed to update user count",
@@ -193,6 +193,7 @@ export const updateDepartment = async (req, res) => {
     });
   }
 };
+
 // ============================================
 // DELETE - Delete department (Only creator or Admin)
 // ============================================
@@ -243,7 +244,6 @@ export const deleteDepartment = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("deleteDepartment error:", error.message);
     return res.status(500).json({
       status: "500",
       message: "Failed to delete department",
@@ -251,6 +251,7 @@ export const deleteDepartment = async (req, res) => {
     });
   }
 };
+
 // ============================================
 // GET - Department statistics
 // ============================================
@@ -291,7 +292,6 @@ export const getDepartmentStats = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("getDepartmentStats error:", error.message);
     return res.status(500).json({
       status: "500",
       message: "Failed to retrieve statistics",

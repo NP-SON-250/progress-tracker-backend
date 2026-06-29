@@ -21,7 +21,5 @@ taskRoute.get("/tasks-by-user/:userId", getTasksByUser);
 // Protected routes (authentication required)
 taskRoute.post("/new-task", fileUpload.none(), normal, createTask);
 taskRoute.put("/update-task/:id", normal, updateTask);
-// Admin only routes
-taskRoute.delete("/delete-task/:id", normal, deleteTask);
 
 export default taskRoute;

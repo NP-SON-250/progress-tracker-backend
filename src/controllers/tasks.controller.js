@@ -19,10 +19,10 @@ const generateTaskNumber = async () => {
     const newNumber = lastNumber + 1;
     return `TSK-${String(newNumber).padStart(5, "0")}`;
   } catch (error) {
-    console.error("Error generating task number:", error);
     throw error;
   }
 };
+
 // Create a new task
 export const createTask = async (req, res) => {
   try {
@@ -183,7 +183,6 @@ export const createTask = async (req, res) => {
       data: populatedTask,
     });
   } catch (error) {
-    console.error("Error creating task:", error);
     res.status(500).json({
       success: false,
       message: error.message || "Failed to create task",
@@ -191,6 +190,7 @@ export const createTask = async (req, res) => {
     });
   }
 };
+
 // Get all tasks with enhanced analytics
 export const getAllTasks = async (req, res) => {
   try {
@@ -198,13 +198,13 @@ export const getAllTasks = async (req, res) => {
       .populate("taskFor", "name")
       .populate("asignedTo", "fullname email")
       .sort({ createdAt: -1 });
+
     res.status(200).json({
       success: true,
       count: tasks.length,
       data: tasks,
     });
   } catch (error) {
-    console.error("Error fetching tasks:", error);
     res.status(500).json({
       success: false,
       message: "Failed to fetch tasks",
@@ -212,6 +212,7 @@ export const getAllTasks = async (req, res) => {
     });
   }
 };
+
 // Get a single task by ID
 export const getTaskById = async (req, res) => {
   try {
@@ -219,18 +220,19 @@ export const getTaskById = async (req, res) => {
     const task = await TasksModel.findById(id)
       .populate("taskFor", "name")
       .populate("asignedTo", "fullname email");
+
     if (!task) {
       return res.status(404).json({
         success: false,
         message: "Task not found",
       });
     }
+
     res.status(200).json({
       success: true,
       data: task,
     });
   } catch (error) {
-    console.error("Error fetching task:", error);
     res.status(500).json({
       success: false,
       message: "Failed to fetch task",
@@ -238,6 +240,7 @@ export const getTaskById = async (req, res) => {
     });
   }
 };
+
 // Update a task
 export const updateTask = async (req, res) => {
   try {
@@ -487,7 +490,6 @@ export const updateTask = async (req, res) => {
       data: populatedTask,
     });
   } catch (error) {
-    console.error("Error updating task:", error);
     return res.status(500).json({
       success: false,
       message: "Failed to update task",
@@ -495,10 +497,12 @@ export const updateTask = async (req, res) => {
     });
   }
 };
+
 // Delete a task
 export const deleteTask = async (req, res) => {
   try {
     const { id } = req.params;
+
     // Check if the logged-in user is an Admin
     const loggedInUser = req.loggedInUser;
     if (!loggedInUser) {
@@ -507,12 +511,14 @@ export const deleteTask = async (req, res) => {
         message: "Unauthorized. Please login first.",
       });
     }
+
     if (loggedInUser.role !== "Admin") {
       return res.status(403).json({
         success: false,
         message: "Access denied. Only Admins can delete tasks.",
       });
     }
+
     // Find the task
     const task = await TasksModel.findById(id);
     if (!task) {
@@ -521,17 +527,21 @@ export const deleteTask = async (req, res) => {
         message: "Task not found",
       });
     }
+
     // Remove task ID from all assigned users
     await UsersModel.updateMany(
       { _id: { $in: task.asignedTo } },
       { $pull: { assignedTasks: task._id } },
     );
+
     // Remove task ID from department
     await DepartmentsModel.findByIdAndUpdate(task.taskFor, {
       $pull: { departmentTasks: task._id },
     });
+
     // Delete the task
     await TasksModel.findByIdAndDelete(id);
+
     res.status(200).json({
       success: true,
       message: "Task deleted",
@@ -543,7 +553,6 @@ export const deleteTask = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error deleting task:", error);
     res.status(500).json({
       success: false,
       message: "Failed to delete task",
@@ -551,6 +560,7 @@ export const deleteTask = async (req, res) => {
     });
   }
 };
+
 // Get tasks by department with enhanced analytics
 export const getTasksByDepartment = async (req, res) => {
   try {
@@ -563,6 +573,7 @@ export const getTasksByDepartment = async (req, res) => {
         message: "Invalid department ID format",
       });
     }
+
     // Get all tasks for the department
     const tasks = await TasksModel.find({ taskFor: departmentId })
       .populate("taskFor", "name")
@@ -577,6 +588,7 @@ export const getTasksByDepartment = async (req, res) => {
         message: "Department not found",
       });
     }
+
     const statusAnalytics = {
       totalTasks: tasks.length,
       runningTasks: tasks.filter((t) => t.status === "Running").length,
@@ -585,6 +597,7 @@ export const getTasksByDepartment = async (req, res) => {
       overdueTasks: tasks.filter((t) => t.status === "Overdue").length,
       closedTasks: tasks.filter((t) => t.status === "Closed").length,
     };
+
     const pieChart = [
       {
         name: "Running",
@@ -607,6 +620,7 @@ export const getTasksByDepartment = async (req, res) => {
         value: statusAnalytics.closedTasks,
       },
     ];
+
     const startOfWeek = new Date();
     startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
 
@@ -625,6 +639,7 @@ export const getTasksByDepartment = async (req, res) => {
         }
       });
     });
+
     const dailyPerformance = {
       Mon: [],
       Tue: [],
@@ -634,6 +649,7 @@ export const getTasksByDepartment = async (req, res) => {
       Sat: [],
       Sun: [],
     };
+
     tasks.forEach((task) => {
       if (task.status === "Running" || task.status === "Completed") {
         const progress = Number(task.progress);
@@ -647,6 +663,7 @@ export const getTasksByDepartment = async (req, res) => {
         }
       }
     });
+
     const barChart = Object.keys(dailyPerformance).map((day) => {
       const values = dailyPerformance[day];
 
@@ -657,6 +674,7 @@ export const getTasksByDepartment = async (req, res) => {
           : 0,
       };
     });
+
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -666,16 +684,17 @@ export const getTasksByDepartment = async (req, res) => {
     const todaysTasks = tasks.filter(
       (task) => task.startDate >= today && task.startDate < tomorrow,
     );
+
     const departmentPerformance = tasks.length
       ? Math.round(
           tasks.reduce((sum, t) => sum + Number(t.progress), 0) / tasks.length,
         )
       : 0;
+
     res.status(200).json({
       success: true,
       data: {
         tasks,
-
         cards: {
           totalTasks: statusAnalytics.totalTasks,
           runningTasks: statusAnalytics.runningTasks,
@@ -684,20 +703,14 @@ export const getTasksByDepartment = async (req, res) => {
           overdueTasks: statusAnalytics.overdueTasks,
           closedTasks: statusAnalytics.closedTasks,
         },
-
         performance: departmentPerformance,
-
         pieChart,
-
         weeklyStatusAnalytics,
-
         barChart,
-
         todaysTasks,
       },
     });
   } catch (error) {
-    console.error("Error fetching department tasks:", error);
     res.status(500).json({
       success: false,
       message: "Failed to fetch department tasks",
@@ -705,6 +718,7 @@ export const getTasksByDepartment = async (req, res) => {
     });
   }
 };
+
 // Get tasks assigned to a specific user
 export const getTasksByUser = async (req, res) => {
   try {
@@ -729,7 +743,6 @@ export const getTasksByUser = async (req, res) => {
       data: tasks,
     });
   } catch (error) {
-    console.error("Error fetching user tasks:", error);
     res.status(500).json({
       success: false,
       message: "Failed to fetch user tasks",
